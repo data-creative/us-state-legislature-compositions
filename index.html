@@ -5,7 +5,8 @@
     <title>US State Legislature Compositions</title>
     <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.css' rel='stylesheet' />
     <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.js'></script>
-    <script src='https://www.mapbox.com/mapbox.js/assets/data/us-states.js'></script>
+    <!--script src='https://www.mapbox.com/mapbox.js/assets/data/us-states.js'></script-->
+    <script src='data/mapbox/us-states.js'></script>
     <script src='http://d3js.org/colorbrewer.v1.min.js'></script>
   </head>
   <body>
@@ -21,21 +22,32 @@
     <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script type="text/javascript">
         L.mapbox.accessToken = 'pk.eyJ1IjoiczJ0MiIsImEiOiJQVFE0UW1JIn0.0MfEvAJVxFx7BLGoL0USXA';
-
-        var map;
-        function drawMap(){
-          if (typeof(map) != "undefined"){ map.remove() };
-
-          map = L.mapbox.map('map-container', 'mapbox.streets', {scrollWheelZoom:false})
-            .setView([40.111688665595956, -97.3388671875], 4)
-            .on("click", logMapClick)
-            .on("dragend", logMapView)
-            .on("zoomend", logMapView)
-        };
         function logMapClick(cc){ console.log("MAP CLICKED ON GEOLOCATION: [" + cc.latlng.lat + ", " + cc.latlng.lng + "]"); };
         function logMapView(){ console.log("MAP VIEW: [" + map.getCenter().lat + ", " + map.getCenter().lng + "], " + map.getZoom()); };
 
-        drawMap()
+        var map = L.mapbox.map('map-container', 'mapbox.streets', {scrollWheelZoom:false})
+          .setView([40.111688665595956, -97.3388671875], 4)
+          .on("click", logMapClick)
+          .on("dragend", logMapView)
+          .on("zoomend", logMapView);
+
+        statesData.features.forEach(function(feature){ // includes all states plus DC and PR
+          var stateName = feature.properties.name;
+          var popupContent = "<strong>State</strong>: " + stateName + "<br/>";
+          var state = L.geoJson(feature, {
+              style: {
+                fillColor: 'steelblue',
+                color: "#fff",
+                weight: 1.5,
+                opacity: .85,
+                fillOpacity: .75,
+                className: 'geojson state ' + stateName
+              }
+          });
+          state.bindPopup(popupContent);
+          map.addLayer(state);
+        });
+
     </script>
   </body>
 </html>

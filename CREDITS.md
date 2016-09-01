@@ -7,3 +7,7 @@
 ## Mapping
 
   + https://github.com/data-creative/us-chronic-disease-indicators
+
+## JavaScript
+
+  + https://github.com/airbnb/javascript#classes--constructors
