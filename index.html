@@ -10,7 +10,8 @@
     <script src='http://d3js.org/colorbrewer.v1.min.js'></script>
   </head>
   <body>
-    <h1>US State Legislature Compositions</h1>
+    <h1 style="inline-block">US State Legislature Compositions</h1>
+    <input type="range" id="year-slider" min=2009 max=2016 value=2009 step=1>
     <div id="map-container" style="height:40em; border:1px solid #000; margin:2em;"></div>
     <div id="map-footer">
       <p>
@@ -21,6 +22,11 @@
     </div>
     <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script type="text/javascript">
+
+        //
+        // MAP
+        //
+
         L.mapbox.accessToken = 'pk.eyJ1IjoiczJ0MiIsImEiOiJQVFE0UW1JIn0.0MfEvAJVxFx7BLGoL0USXA';
         function logMapClick(cc){ console.log("MAP CLICKED ON GEOLOCATION: [" + cc.latlng.lat + ", " + cc.latlng.lng + "]"); };
         function logMapView(){ console.log("MAP VIEW: [" + map.getCenter().lat + ", " + map.getCenter().lng + "], " + map.getZoom()); };
@@ -47,6 +53,19 @@
           state.bindPopup(popupContent);
           map.addLayer(state);
         });
+
+        //
+        // CONTROLS
+        //
+
+
+        var yearSlider = document.getElementById('year-slider')
+          .addEventListener("change", handleYearChange, false)
+
+        function handleYearChange(){
+          console.log("YEAR: " + this.value);
+        };
+
 
     </script>
   </body>
