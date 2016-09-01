@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>US Chronic Disease Indicators</title>
+    <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.css' rel='stylesheet' />
+    <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.js'></script>
+    <script src='https://www.mapbox.com/mapbox.js/assets/data/us-states.js'></script>
+    <script src='http://d3js.org/colorbrewer.v1.min.js'></script>
+  </head>
+  <body>
+    <h1>US Chronic Disease Indicators</h1>
+
+    <select id="year-selector" title="Select a year or year range">
+      <option value="2013" selected="selected">2013</option>
+    </select>
+
+    <select id="indicator-selector" title="Select an indicator">
+      <option value="MTH1_0" selected="selected" >Recent mentally unhealthy days among adults aged ≥18 years</option>
+    </select>
+
+    <select id="gender-selector" title="Select a gender">
+      <option value="GENT" selected="selected">All Genders</option>
+      <option value="GENM">Male</option>
+      <option value="GENF">Female</option>
+    </select>
+    <!--button id="map-requestor" title="Refresh map based on selections">Update</button-->
+
+    <div id="map-container" style="height:40em; border:1px solid #000; margin:2em;"></div>
+    <div id="map-footer">
+      <p>
+        <a href="http://data-creative.github.io/us-state-legislature-compositions/">view</a> |
+        <a href="https://github.com/data-creative/us-state-legislature-compositions">source</a> |
+        <a href="https://github.com/dwillis/state_legislatures">data</a>
+      </p>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script type="text/javascript">
+
+        // MAP
+
+        L.mapbox.accessToken = 'pk.eyJ1IjoiczJ0MiIsImEiOiJQVFE0UW1JIn0.0MfEvAJVxFx7BLGoL0USXA'
+        var mapbox_map_id = 'mapbox.streets'
+        var map_center = [40.111688665595956, -97.3388671875]
+        var map_zoom = 4
+        var map;
+
+        function updateMap(){
+            if (typeof(map) != "undefined") {
+                map.remove()
+            }
+            map = L.mapbox.map('map-container', mapbox_map_id, {scrollWheelZoom:false})
+                  .setView(map_center, map_zoom)
+                  .on("click", logMapClick)
+                  .on("dragend", logMapView)
+                  .on("zoomend", logMapView)
+        };
+
+        function logMapClick(cc){
+            console.log("MAP CLICKED ON GEOLOCATION: [" + cc.latlng.lat + ", " + cc.latlng.lng + "]")
+        };
+
+        function logMapView(){
+            var current_center = map.getCenter()
+            console.log("MAP VIEW: [" + current_center.lat + ", " + current_center.lng + "], " + map.getZoom()  )
+        };
+
+        // SELECTIONS AND REQUESTS
+
+        var yearSelector = document.getElementById('year-selector');
+        var indicatorSelector = document.getElementById('indicator-selector');
+        var genderSelector = document.getElementById('gender-selector');
+
+        yearSelector.addEventListener("change", drawMap, false);
+        indicatorSelector.addEventListener("change", drawMap, false);
+        genderSelector.addEventListener("change", drawMap, false);
+
+        var rows;
+        var colorScale = d3.scale.linear();
+        function drawMap(request){
+            var year = yearSelector.value
+            var strat_id = genderSelector.value
+            var strat_name = genderSelector[genderSelector.selectedIndex].textContent.trim()
+            var indicator_id = indicatorSelector.value
+            var indicator_desc = indicatorSelector[indicatorSelector.selectedIndex].textContent.trim()
+
+            // UPDATE COLOR PALETTE AND COLOR SCALE RANGE
+
+            switch(strat_id){
+            case "GENT":
+                var palette = colorbrewer.Purples[9]
+                break;
+            case "GENM":
+                var palette = colorbrewer.Blues[9]
+                break;
+            case "GENF":
+                var palette = colorbrewer.Reds[9]
+                break;
+            default:
+                var palette = colorbrewer.Greys[9]
+            }
+            colorScale.range([ palette[2], palette[5], palette[8] ])
+
+            updateMap()
+
+            d3.csv("data/query_results.csv", function(error, csv_data){
+                if (error) return console.warn(error);
+                rows = csv_data.filter(function(row){
+                  return row["year"] == year && row["indicatorid"] == indicator_id && row["stratificationid1"] == strat_id
+                })
+                var values = rows.map(function(row){return row["datavalue"]})
+                var quantiles = [ d3.min(values), d3.mean(values), d3.max(values) ]
+
+                colorScale.domain(quantiles)
+
+                rows.forEach(function(row) {
+                    var state_geojson_features = statesData.features.filter(function(feature){ return feature.properties.name == row["locationdesc"]; })
+                    if(state_geojson_features.length > 0){
+                        var state_geojson_feature = state_geojson_features[0]
+                        var state_name = state_geojson_feature.properties.name
+                        var state_value = row["datavalue"]
+                        var state_high = row["highconfidenceinterval"]
+                        var state_low = row["lowconfidenceinterval"]
+                        var geojson_options = {
+                            style: {
+                                fillColor: colorScale(state_value),
+                                color: "#fff", //colorScale(state_value),
+                                weight: 1.5,
+                                opacity: .85,
+                                fillOpacity: .75,
+                                className: 'geojson state ' + state_name
+                            }
+                        }
+                        var state = L.geoJson(state_geojson_feature, geojson_options)
+                        var popup_content = "<strong>State</strong>: " + state_name + "<br/>" +
+                            "<strong>Year</strong>: " + year + "<br/>" +
+                            "<strong>Indicator</strong>: " + indicator_desc + "<br/>" +
+                            "<strong>Gender</strong>: " + strat_name + "<br/>" +
+                            "<strong>Age-adjusted Mean</strong>: " + state_value + "<br/>" +
+                            "<strong>Confidence Interval</strong>: " + state_low + " to " + state_high
+
+                        state.bindPopup(popup_content)
+                        map.addLayer(state)
+
+                    } // end if
+                }); // end forEach
+            }); // end d3.csv
+        }; // end drawMap
+
+        drawMap()
+
+    </script>
+  </body>
+</html>
