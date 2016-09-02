@@ -4,10 +4,9 @@
     <meta charset="utf-8">
     <title>US State Legislature Compositions</title>
     <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.css' rel='stylesheet' />
+    <!--link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"-->
     <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.js'></script>
     <!--script src='https://www.mapbox.com/mapbox.js/assets/data/us-states.js'></script-->
-    <script src='data/mapbox/us-states.js'></script>
-    <script src='http://d3js.org/colorbrewer.v1.min.js'></script>
   </head>
   <body>
     <h1 style="display:inline-block;">
@@ -19,6 +18,17 @@
       <span>2009</span>
       <input type="range" id="year-slider" min=2009 max=2016 value=2009 step=1 defaultValue=2009>
       <span>2016</span>
+
+      <button type="button" id="year-play">
+        <i class="fa fa-play" aria-hidden="true"></i>
+      </button>
+      <button type="button" id="year-pause">
+        <i class="fa fa-pause" aria-hidden="true"></i>
+      </button>
+      <button type="button" id="year-restart">
+        <i class="fa fa-fast-backward" aria-hidden="true"></i>
+      </button>
+
     </div>
 
     <div id="map-container" style="height:40em; border:1px solid #000; margin:2em;"></div>
@@ -30,6 +40,9 @@
       </p>
     </div>
 
+    <script src='data/mapbox/us-states.js'></script>
+    <script src='https://d3js.org/colorbrewer.v1.min.js'></script>
+    <script src="https://use.fontawesome.com/4fbdaa660e.js"></script>
     <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script type="text/javascript">
 
@@ -78,10 +91,16 @@
 
         displayYear();
 
-        setInterval(function(){
-          inputYear.stepUp();
-          displayYear();
-        }, 3000);
+        var playButton = document.getElementById("year-play");
+        playButton.addEventListener("click", playYears, false)
+
+        function playYears(){
+          setInterval(function(){
+            inputYear.stepUp();
+            displayYear();
+          }, 2500);
+        };
+
 
 
     </script>
