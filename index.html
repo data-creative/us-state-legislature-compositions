@@ -10,8 +10,17 @@
     <script src='http://d3js.org/colorbrewer.v1.min.js'></script>
   </head>
   <body>
-    <h1 style="inline-block">US State Legislature Compositions</h1>
-    <input type="range" id="year-slider" min=2009 max=2016 value=2009 step=1>
+    <h1 style="display:inline-block;">
+      US State Legislature Compositions
+      in <span id="year-display">2009</span>
+    </h1>
+    <div id="year-input-group">
+      <label for="year-slider">Select a Year:</label>
+      <span>2009</span>
+      <input type="range" id="year-slider" min=2009 max=2016 value=2009 step=1 defaultValue=2009>
+      <span>2016</span>
+    </div>
+
     <div id="map-container" style="height:40em; border:1px solid #000; margin:2em;"></div>
     <div id="map-footer">
       <p>
@@ -20,6 +29,7 @@
         <a href="https://github.com/dwillis/state_legislatures">data</a>
       </p>
     </div>
+
     <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script type="text/javascript">
 
@@ -58,13 +68,20 @@
         // CONTROLS
         //
 
-
-        var yearSlider = document.getElementById('year-slider')
-          .addEventListener("change", handleYearChange, false)
-
-        function handleYearChange(){
-          console.log("YEAR: " + this.value);
+        var yearDisplay = document.getElementById("year-display");
+        var inputYear = document.getElementById('year-slider');
+        inputYear.addEventListener("change", displayYear, false);
+        function displayYear(){
+          console.log("YEAR: " + inputYear.value);
+          yearDisplay.innerHTML = inputYear.value;
         };
+
+        displayYear();
+
+        setInterval(function(){
+          inputYear.stepUp();
+          displayYear();
+        }, 3000);
 
 
     </script>
