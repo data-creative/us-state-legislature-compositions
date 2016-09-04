@@ -5,21 +5,33 @@
     <title>US State Legislature Compositions</title>
     <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.css' rel='stylesheet' />
     <!--link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"-->
-    <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.js'></script>
-    <!--script src='https://www.mapbox.com/mapbox.js/assets/data/us-states.js'></script-->
   </head>
   <body>
     <h1 style="display:inline-block;">
-      US State Legislature Compositions
-      &mdash; <span id="dimension-display">Total Seats</span>
+      US State Legislatures
+      by <span id="dimension-display">Size</span>
       in <span id="year-display">2009</span>
     </h1>
+
+    <div id="dimension-input-group">
+      <label for="dimension-selector">Select a Dimension:</label>
+      <select id="dimension-selector">
+        <option value="size">Size</option>
+        <option value="pct-male">Percent Male</option>
+        <option value="pct-female">Percent Female</option>
+        <option value="pct-dem">Percent Democrat</option>
+        <option value="pct-gop">Percent Republican</option>
+      </select>
+    </div>
+
     <div id="year-input-group">
       <label for="year-slider">Select a Year:</label>
       <!--span>2009</span-->
       <input type="range" id="year-slider" min=2009 max=2016 value=2009 step=1 defaultValue=2009>
       <!--span>2016</span-->
+    </div>
 
+    <!--div id="player-controls">
       <button type="button" id="year-play">
         <i class="fa fa-play" aria-hidden="true"></i>
       </button>
@@ -29,13 +41,7 @@
       <button type="button" id="year-restart">
         <i class="fa fa-fast-backward" aria-hidden="true"></i>
       </button>
-    </div>
-    <div id="dimension-input-group">
-      <label for="dimension-selector">Select a Composition Dimension:</label>
-      <select id="dimension-selector">
-        <option value="seats">Total Seats</option>
-      </select>
-    </div>
+    </div-->
 
     <div id="map-container" style="height:40em; border:1px solid #000; margin:2em;"></div>
 
@@ -47,11 +53,88 @@
       </p>
     </div>
 
+    <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.js'></script>
     <script src='data/mapbox/us-states.js'></script>
-    <script src='https://d3js.org/colorbrewer.v1.min.js'></script>
-    <script src="https://use.fontawesome.com/4fbdaa660e.js"></script>
     <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src='https://d3js.org/colorbrewer.v1.min.js'></script>
+    <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="https://use.fontawesome.com/4fbdaa660e.js"></script>
     <script type="text/javascript">
+
+        //
+        // SELECTORS
+        //
+
+        // YEAR
+
+        var yearDisplay = document.getElementById("year-display");
+        var yearInput = document.getElementById('year-slider');
+        yearInput.addEventListener("change", selectYear, false);
+
+        function selectYear(){
+            displayYear();
+            //updateMap();
+        };
+
+        function displayYear(){
+            console.log("YEAR", yearInput.value);
+            yearDisplay.innerHTML = yearInput.value;
+        };
+
+        selectYear();
+
+        // DIMENSION
+
+        var dimensionDisplay = document.getElementById("dimension-display");
+        var dimensionSelector = document.getElementById('dimension-selector');
+        dimensionSelector.addEventListener("change", selectDimension, false)
+
+        function selectDimension(){
+            displayDimension();
+            //updateMap();
+        };
+
+        function displayDimension(){
+          var k = dimensionSelector.value;
+          var v = dimensionSelector[dimensionSelector.selectedIndex].textContent.trim();
+          console.log("DIMENSION", k, v)
+          dimensionDisplay.innerHTML = v;
+        };
+
+        selectDimension();
+
+        //
+        // COLORS
+        //
+
+        var colorScale = d3.scale.linear();
+
+        function setColorPalette(){
+            var palette;
+            var selectedDimension = dimensionSelector.value;
+            switch(selectedDimension){
+                case "size":
+                    palette = colorbrewer.Greys[9]
+                    break;
+                case "pct-male":
+                    palette = colorbrewer.GnBu[9]
+                    break;
+                case "pct-female":
+                    palette = colorbrewer.RdPu[9]
+                    break;
+                case "pct-dem":
+                    palette = colorbrewer.Blues[9]
+                    break;
+                case "pct-gop":
+                    palette = colorbrewer.Reds[9]
+                    break;
+                default:
+                   palette = colorbrewer.YlGn[9]
+            };
+            colorScale.range([ palette[2], palette[5], palette[8] ]);
+        }
+
+        setColorPalette();
 
         //
         // MAP
@@ -84,67 +167,53 @@
             map.addLayer(state);
         });
 
-        //
-        // CONTROLS
-        //
+        ////
+        //// CONTROLS
+        ////
 
-        // YEAR
+        //// PLAY
 
-        var yearDisplay = document.getElementById("year-display");
-        var inputYear = document.getElementById('year-slider');
+        //var playButton = document.getElementById("year-play");
+        //playButton.addEventListener("click", playYears, false);
 
-        inputYear.addEventListener("change", displayYear, false);
+        //var playIntervalId;
 
-        function displayYear(){
-            console.log(inputYear.value);
-            yearDisplay.innerHTML = inputYear.value;
-        };
+        //function playYears(){
+        //    console.log("PLAY FROM", yearInput.value);
+        //    playIntervalId = setInterval(function(){
+        //        if (yearInput.value == yearInput.max) {
+        //            console.log("NOT PLAYING")
+        //            pauseYears();
+        //        } else {
+        //            yearInput.stepUp();
+        //            displayYear();
+        //        };
+        //    }, 2500);
+        //};
 
-        displayYear();
+        //// PAUSE
 
-        // PLAY
+        //var pauseButton = document.getElementById("year-pause");
+        //pauseButton.addEventListener("click", pauseYears, false);
 
-        var playButton = document.getElementById("year-play");
-        playButton.addEventListener("click", playYears, false);
+        //function pauseYears(){
+        //    console.log("PAUSE", yearInput.value)
+        //    clearInterval(playIntervalId);
+        //    playIntervalId = null;
+        //};
 
-        var playIntervalId;
+        //// START OVER
 
-        function playYears(){
-            console.log("PLAY FROM", inputYear.value);
-            playIntervalId = setInterval(function(){
-                if (inputYear.value == inputYear.max) {
-                    console.log("NOT PLAYING")
-                    pauseYears();
-                } else {
-                    inputYear.stepUp();
-                    displayYear();
-                };
-            }, 2500);
-        };
+        //var restartButton = document.getElementById("year-restart");
+        //restartButton.addEventListener("click", restartYears, false);
 
-        // PAUSE
-
-        var pauseButton = document.getElementById("year-pause");
-        pauseButton.addEventListener("click", pauseYears, false);
-
-        function pauseYears(){
-            console.log("PAUSE", inputYear.value)
-            clearInterval(playIntervalId);
-            playIntervalId = null;
-        };
-
-        // START OVER
-
-        var restartButton = document.getElementById("year-restart");
-        restartButton.addEventListener("click", restartYears, false);
-
-        function restartYears(){
-            console.log("RESTART", inputYear.value, "TO", inputYear.defaultValue);
-            pauseYears();
-            inputYear.value = inputYear.defaultValue;
-            displayYear();
-            playYears();
-        };
+        //function restartYears(){
+        //    console.log("RESTART", yearInput.value, "TO", yearInput.defaultValue);
+        //    pauseYears();
+        //    yearInput.value = yearInput.defaultValue;
+        //    displayYear();
+        //    playYears();
+        //};
 
 
 

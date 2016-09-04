@@ -2,7 +2,9 @@
 
 ## Source Data
 
-  + https://github.com/AdvancedEnergyEconomy/state_legislatures
+  + https://www.mapbox.com/mapbox.js/assets/data/us-states.js
+  + https://github.com/dwillis/state_legislatures
+  + https://d3js.org/colorbrewer.v1.min.js
 
 ## Mapping
 
@@ -19,3 +21,7 @@
   + http://www.w3schools.com/jsref/prop_html_innerhtml.asp
   + http://www.w3schools.com/jsref/met_win_settimeout.asp
   + http://www.w3schools.com/tags/tag_label.asp
+
+## Colors
+
+  + https://bl.ocks.org/mbostock/5577023
