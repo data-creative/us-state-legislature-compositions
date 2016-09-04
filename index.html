@@ -116,23 +116,23 @@
                 case "size":
                     palette = colorbrewer.Greys[9]
                     break;
-                case "pct-male":
-                    palette = colorbrewer.GnBu[9]
-                    break;
-                case "pct-female":
-                    palette = colorbrewer.RdPu[9]
-                    break;
                 case "pct-dem":
                     palette = colorbrewer.Blues[9]
                     break;
                 case "pct-gop":
                     palette = colorbrewer.Reds[9]
                     break;
-                default:
-                   palette = colorbrewer.YlGn[9]
+                case "pct-male":
+                    palette = colorbrewer.GnBu[9]
+                    break;
+                case "pct-female":
+                    palette = colorbrewer.RdPu[9]
+                    break;
+                //default:
+                //   palette = colorbrewer.YlGn[9]
             };
             colorScale.range([ palette[2], palette[5], palette[8] ]);
-        }
+        };
 
         function calibrateColorScale(values){
             var quantiles = [ d3.min(values), d3.mean(values), d3.max(values) ]
@@ -149,10 +149,11 @@
         function logMapView(){ console.log("MAP VIEW: [" + map.getCenter().lat + ", " + map.getCenter().lng + "], " + map.getZoom()); };
 
         var map;
-
+        var zz;
         function updateMap(){
             console.log("UPDATE MAP");
             var selectedYear = yearSelector.value;
+            var selectedDimensionValue = dimensionSelector.value;
             var selectedDimensionTitle = dimensionSelector[dimensionSelector.selectedIndex].textContent.trim();
 
             if (typeof(map) != "undefined") { map.remove(); };
@@ -163,29 +164,59 @@
                 .on("zoomend", logMapView);
 
             setColorPalette();
-            calibrateColorScale([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]); // todo: lookup
 
-            statesData.features.forEach(function(feature){ // includes all states plus DC and PR
-                var stateName = feature.properties.name;
-                var compositionValue = 0.7; // todo: lookup
-                var popupContent = "<strong>State</strong>: " + stateName
-                    + "<br/>" + "<strong>Year</strong>: " + selectedYear
-                    + "<br/>" + "<strong>" + selectedDimensionTitle + "</strong>: " + compositionValue
+            var requestUrl = compileRequestUrl();
+            d3.json(requestUrl, function(err, response){
+                console.log("RESPONSE", response["year"], response["states"].length)
+                var states = response["states"];
+                zz = states; // for debugging in the console
 
-                var state = L.geoJson(feature, {
-                      style: {
-                          fillColor: colorScale(compositionValue),
-                          color: "#fff",
-                          weight: 1.5,
-                          opacity: .85,
-                          fillOpacity: .75,
-                          className: 'geojson state ' + stateName
-                      }
+                calibrateColorScale([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]); // todo: lookup
+
+                // todo: loop through composition data instead of feature data ...
+                // and lookup feature by matching on state name ...
+                // feature = statesData.features.filter(function(feature){ return feature.properties.name == row["name"]; })
+                statesData.features.forEach(function(feature){ // includes all states plus DC and PR
+                    var stateName = feature.properties.name;
+                    var compositionValue = 0.7; // todo: lookup
+                    var popupContent = "<strong>State</strong>: " + stateName
+                        + "<br/>" + "<strong>Year</strong>: " + selectedYear
+                        + "<br/>" + "<strong>" + selectedDimensionTitle + "</strong>: " + compositionValue
+
+                    var state = L.geoJson(feature, {
+                          style: {
+                              fillColor: colorScale(compositionValue),
+                              color: "#fff",
+                              weight: 1.5,
+                              opacity: .85,
+                              fillOpacity: .75,
+                              className: 'geojson state ' + stateName
+                          }
+                    });
+                    state.bindPopup(popupContent);
+                    map.addLayer(state);
                 });
-                state.bindPopup(popupContent);
-                map.addLayer(state);
             });
         };
+
+        var urlBase = "https://raw.githubusercontent.com/data-creative/state_legislatures/master/data/";
+        function compileRequestUrl(){
+          var selectedYear = yearSelector.value;
+          var selectedDimensionValue = dimensionSelector.value;
+          var url;
+          switch(selectedDimensionValue){
+              case "size":
+              case "pct-dem":
+              case "pct-gop":
+                  url = urlBase + "party_composition/json/" + selectedYear + ".json"
+                  break;
+              case "pct-male":
+              case "pct-female":
+                  url = urlBase + "gender_composition/json/" + selectedYear + ".json"
+                  break;
+          };
+          return url;
+        }
 
         updateMap();
 
