@@ -16,11 +16,11 @@
     <div id="dimension-input-group">
       <label for="dimension-selector">Select a Dimension:</label>
       <select id="dimension-selector">
-        <option value="size">Size</option>
-        <option value="pct-male">Percent Male</option>
-        <option value="pct-female">Percent Female</option>
-        <option value="pct-dem">Percent Democrat</option>
-        <option value="pct-gop">Percent Republican</option>
+        <option value="size">Legislature Size</option>
+        <option value="pct-male">Legislature Percent Male</option>
+        <option value="pct-female">Legislature Percent Female</option>
+        <option value="pct-dem">Legislature Percent Democrat</option>
+        <option value="pct-gop">Legislature Percent Republican</option>
       </select>
     </div>
 
@@ -68,40 +68,40 @@
         // YEAR
 
         var yearDisplay = document.getElementById("year-display");
-        var yearInput = document.getElementById('year-slider');
-        yearInput.addEventListener("change", selectYear, false);
+        var yearSelector = document.getElementById('year-slider');
+        yearSelector.addEventListener("change", selectYear, false);
 
         function selectYear(){
             displayYear();
-            //updateMap();
+            updateMap();
         };
 
         function displayYear(){
-            console.log("YEAR", yearInput.value);
-            yearDisplay.innerHTML = yearInput.value;
+            var selectedYear = yearSelector.value;
+            console.log("YEAR", selectedYear);
+            yearDisplay.innerHTML = selectedYear;
         };
 
-        selectYear();
+        displayYear();
 
         // DIMENSION
 
         var dimensionDisplay = document.getElementById("dimension-display");
         var dimensionSelector = document.getElementById('dimension-selector');
-        dimensionSelector.addEventListener("change", selectDimension, false)
+        dimensionSelector.addEventListener("change", selectDimension, false);
 
         function selectDimension(){
-            displayDimension();
-            //updateMap();
+          displayDimension();
+          updateMap();
         };
 
         function displayDimension(){
-          var k = dimensionSelector.value;
-          var v = dimensionSelector[dimensionSelector.selectedIndex].textContent.trim();
-          console.log("DIMENSION", k, v)
-          dimensionDisplay.innerHTML = v;
+          var selectedDimensionTitle = dimensionSelector[dimensionSelector.selectedIndex].textContent.trim();
+          console.log("DIMENSION", selectedDimensionTitle)
+          dimensionDisplay.innerHTML = selectedDimensionTitle;
         };
 
-        selectDimension();
+        displayDimension();
 
         //
         // COLORS
@@ -110,9 +110,9 @@
         var colorScale = d3.scale.linear();
 
         function setColorPalette(){
+            var selectedDimensionValue = dimensionSelector.value;
             var palette;
-            var selectedDimension = dimensionSelector.value;
-            switch(selectedDimension){
+            switch(selectedDimensionValue){
                 case "size":
                     palette = colorbrewer.Greys[9]
                     break;
@@ -134,7 +134,11 @@
             colorScale.range([ palette[2], palette[5], palette[8] ]);
         }
 
-        setColorPalette();
+        function calibrateColorScale(values){
+            var quantiles = [ d3.min(values), d3.mean(values), d3.max(values) ]
+            console.log("CALIBRATE COLORS AROUND", quantiles)
+            colorScale.domain(quantiles);
+        };
 
         //
         // MAP
@@ -144,28 +148,46 @@
         function logMapClick(cc){ console.log("MAP CLICKED ON GEOLOCATION: [" + cc.latlng.lat + ", " + cc.latlng.lng + "]"); };
         function logMapView(){ console.log("MAP VIEW: [" + map.getCenter().lat + ", " + map.getCenter().lng + "], " + map.getZoom()); };
 
-        var map = L.mapbox.map('map-container', 'mapbox.streets', {scrollWheelZoom:false})
-            .setView([40.111688665595956, -97.3388671875], 4)
-            .on("click", logMapClick)
-            .on("dragend", logMapView)
-            .on("zoomend", logMapView);
+        var map;
 
-        statesData.features.forEach(function(feature){ // includes all states plus DC and PR
-            var stateName = feature.properties.name;
-            var popupContent = "<strong>State</strong>: " + stateName + "<br/>";
-            var state = L.geoJson(feature, {
-                  style: {
-                      fillColor: 'steelblue',
-                      color: "#fff",
-                      weight: 1.5,
-                      opacity: .85,
-                      fillOpacity: .75,
-                      className: 'geojson state ' + stateName
-                  }
+        function updateMap(){
+            console.log("UPDATE MAP");
+            var selectedYear = yearSelector.value;
+            var selectedDimensionTitle = dimensionSelector[dimensionSelector.selectedIndex].textContent.trim();
+
+            if (typeof(map) != "undefined") { map.remove(); };
+            map = L.mapbox.map('map-container', 'mapbox.streets', {scrollWheelZoom:false})
+                .setView([40.111688665595956, -97.3388671875], 4)
+                .on("click", logMapClick)
+                .on("dragend", logMapView)
+                .on("zoomend", logMapView);
+
+            setColorPalette();
+            calibrateColorScale([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]); // todo: lookup
+
+            statesData.features.forEach(function(feature){ // includes all states plus DC and PR
+                var stateName = feature.properties.name;
+                var compositionValue = 0.7; // todo: lookup
+                var popupContent = "<strong>State</strong>: " + stateName
+                    + "<br/>" + "<strong>Year</strong>: " + selectedYear
+                    + "<br/>" + "<strong>" + selectedDimensionTitle + "</strong>: " + compositionValue
+
+                var state = L.geoJson(feature, {
+                      style: {
+                          fillColor: colorScale(compositionValue),
+                          color: "#fff",
+                          weight: 1.5,
+                          opacity: .85,
+                          fillOpacity: .75,
+                          className: 'geojson state ' + stateName
+                      }
+                });
+                state.bindPopup(popupContent);
+                map.addLayer(state);
             });
-            state.bindPopup(popupContent);
-            map.addLayer(state);
-        });
+        };
+
+        updateMap();
 
         ////
         //// CONTROLS
@@ -179,13 +201,13 @@
         //var playIntervalId;
 
         //function playYears(){
-        //    console.log("PLAY FROM", yearInput.value);
+        //    console.log("PLAY FROM", yearSelector.value);
         //    playIntervalId = setInterval(function(){
-        //        if (yearInput.value == yearInput.max) {
+        //        if (yearSelector.value == yearSelector.max) {
         //            console.log("NOT PLAYING")
         //            pauseYears();
         //        } else {
-        //            yearInput.stepUp();
+        //            yearSelector.stepUp();
         //            displayYear();
         //        };
         //    }, 2500);
@@ -197,7 +219,7 @@
         //pauseButton.addEventListener("click", pauseYears, false);
 
         //function pauseYears(){
-        //    console.log("PAUSE", yearInput.value)
+        //    console.log("PAUSE", yearSelector.value)
         //    clearInterval(playIntervalId);
         //    playIntervalId = null;
         //};
@@ -208,9 +230,9 @@
         //restartButton.addEventListener("click", restartYears, false);
 
         //function restartYears(){
-        //    console.log("RESTART", yearInput.value, "TO", yearInput.defaultValue);
+        //    console.log("RESTART", yearSelector.value, "TO", yearSelector.defaultValue);
         //    pauseYears();
-        //    yearInput.value = yearInput.defaultValue;
+        //    yearSelector.value = yearSelector.defaultValue;
         //    displayYear();
         //    playYears();
         //};
