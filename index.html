@@ -55,9 +55,8 @@
 
     <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.js'></script>
     <script src='data/mapbox/us-states.js'></script>
-    <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src='https://d3js.org/colorbrewer.v1.min.js'></script>
-    <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="https://use.fontawesome.com/4fbdaa660e.js"></script>
     <script type="text/javascript">
 
@@ -144,6 +143,7 @@
         // MAP
         //
 
+        var featureCollection = statesData; // see: us-states.js ... includes all states plus DC and PR
         L.mapbox.accessToken = 'pk.eyJ1IjoiczJ0MiIsImEiOiJQVFE0UW1JIn0.0MfEvAJVxFx7BLGoL0USXA';
         function logMapClick(cc){ console.log("MAP CLICKED ON GEOLOCATION: [" + cc.latlng.lat + ", " + cc.latlng.lng + "]"); };
         function logMapView(){ console.log("MAP VIEW: [" + map.getCenter().lat + ", " + map.getCenter().lng + "], " + map.getZoom()); };
@@ -168,55 +168,104 @@
             var requestUrl = compileRequestUrl();
             d3.json(requestUrl, function(err, response){
                 console.log("RESPONSE", response["year"], response["states"].length)
-                var states = response["states"];
-                zz = states; // for debugging in the console
+                zz = response["states"]; // for debugging in the console
 
-                calibrateColorScale([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]); // todo: lookup
+                calibrateColorScale(lookupAllValues(response["states"]));
 
-                // todo: loop through composition data instead of feature data ...
-                // and lookup feature by matching on state name ...
-                // feature = statesData.features.filter(function(feature){ return feature.properties.name == row["name"]; })
-                statesData.features.forEach(function(feature){ // includes all states plus DC and PR
+                featureCollection.features.forEach(function(feature){
                     var stateName = feature.properties.name;
-                    var compositionValue = 0.7; // todo: lookup
-                    var popupContent = "<strong>State</strong>: " + stateName
-                        + "<br/>" + "<strong>Year</strong>: " + selectedYear
-                        + "<br/>" + "<strong>" + selectedDimensionTitle + "</strong>: " + compositionValue
+                    var compositionValue = lookupValue(response["states"], stateName);
+                    if (compositionValue) {
+                        var popupContent = "<strong>State</strong>: " + stateName
+                            + "<br/>" + "<strong>Year</strong>: " + selectedYear
+                            + "<br/>" + "<strong>" + selectedDimensionTitle + "</strong>: " + compositionValue
 
-                    var state = L.geoJson(feature, {
-                          style: {
-                              fillColor: colorScale(compositionValue),
-                              color: "#fff",
-                              weight: 1.5,
-                              opacity: .85,
-                              fillOpacity: .75,
-                              className: 'geojson state ' + stateName
-                          }
-                    });
-                    state.bindPopup(popupContent);
-                    map.addLayer(state);
+                        var stateLayer = L.geoJson(feature, {
+                              style: {
+                                  fillColor: colorScale(compositionValue),
+                                  color: "#fff",
+                                  weight: 1.5,
+                                  opacity: .85,
+                                  fillOpacity: .75,
+                                  className: 'geojson state ' + stateName
+                              }
+                        });
+                        stateLayer.bindPopup(popupContent);
+                        map.addLayer(stateLayer);
+                    };
                 });
             });
         };
 
         var urlBase = "https://raw.githubusercontent.com/data-creative/state_legislatures/master/data/";
         function compileRequestUrl(){
-          var selectedYear = yearSelector.value;
-          var selectedDimensionValue = dimensionSelector.value;
-          var url;
-          switch(selectedDimensionValue){
-              case "size":
-              case "pct-dem":
-              case "pct-gop":
-                  url = urlBase + "party_composition/json/" + selectedYear + ".json"
-                  break;
-              case "pct-male":
-              case "pct-female":
-                  url = urlBase + "gender_composition/json/" + selectedYear + ".json"
-                  break;
-          };
-          return url;
-        }
+            var selectedYear = yearSelector.value;
+            var selectedDimensionValue = dimensionSelector.value;
+            var url;
+            switch(selectedDimensionValue){
+                case "size":
+                case "pct-dem":
+                case "pct-gop":
+                    url = urlBase + "party_composition/json/" + selectedYear + ".json"
+                    break;
+                case "pct-male":
+                case "pct-female":
+                    url = urlBase + "gender_composition/json/" + selectedYear + ".json"
+                    break;
+            };
+            return url;
+        };
+
+        function lookupAllValues(statesArray){
+            var valuesArray;
+            var selectedDimensionValue = dimensionSelector.value;
+            switch(selectedDimensionValue){
+                case "size":
+                    valuesArray = statesArray.map(function(stateObj){ return stateObj["legislature_seats"] });
+                    break;
+                //case "pct-dem":
+                //    valuesArray =
+                //    break;
+                //case "pct-gop":
+                //    valuesArray =
+                //    break;
+                //case "pct-male":
+                //    valuesArray =
+                //    break;
+                //case "pct-female":
+                //    valuesArray =
+                //    break;
+                default:
+                    valuesArray = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+            };
+            return valuesArray;
+        };
+
+        function lookupValue(statesArray, stateName){
+            var value;
+            var selectedDimensionValue = dimensionSelector.value;
+            var stateObj = statesArray.find(function(stateObj){ return stateObj["name"] == stateName; });
+            switch(selectedDimensionValue){
+                case "size":
+                    value = stateObj["legislature_seats"];
+                    break;
+                //case "pct-dem":
+                //    valuesArray =
+                //    break;
+                //case "pct-gop":
+                //    valuesArray =
+                //    break;
+                //case "pct-male":
+                //    valuesArray =
+                //    break;
+                //case "pct-female":
+                //    valuesArray =
+                //    break;
+                default:
+                    value = 0.7
+            };
+            return value;
+        };
 
         updateMap();
 
