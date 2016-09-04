@@ -81,9 +81,13 @@
         // CONTROLS
         //
 
+        // YEAR
+
         var yearDisplay = document.getElementById("year-display");
         var inputYear = document.getElementById('year-slider');
+
         inputYear.addEventListener("change", displayYear, false);
+
         function displayYear(){
           console.log("YEAR: " + inputYear.value);
           yearDisplay.innerHTML = inputYear.value;
@@ -91,14 +95,52 @@
 
         displayYear();
 
+        // PLAY
+
         var playButton = document.getElementById("year-play");
-        playButton.addEventListener("click", playYears, false)
+
+        playButton.addEventListener("click", playYears, false);
+
+        var playIntervalId;
 
         function playYears(){
-          setInterval(function(){
+          console.log("PLAY FROM", inputYear.value);
+
+          playIntervalId = setInterval(function(){
             inputYear.stepUp();
+
             displayYear();
           }, 2500);
+        };
+
+        // PAUSE
+
+        var pauseButton = document.getElementById("year-pause");
+
+        pauseButton.addEventListener("click", pauseYears, false);
+
+        function pauseYears(){
+          console.log("PAUSE", inputYear.value)
+
+          clearInterval(playIntervalId);
+
+          playIntervalId = null;
+        };
+
+        // START OVER
+
+        var restartButton = document.getElementById("year-restart");
+
+        restartButton.addEventListener("click", restartYears, false);
+
+        function restartYears(){
+          console.log("RESTART", inputYear.value, "TO", inputYear.defaultValue);
+
+          pauseYears();
+
+          inputYear.value = inputYear.defaultValue;
+
+          playYears();
         };
 
 

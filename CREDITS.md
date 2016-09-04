@@ -11,6 +11,7 @@
 ## JavaScript
 
   + https://github.com/airbnb/javascript#classes--constructors
+  + http://stackoverflow.com/questions/109086/stop-setinterval-call-in-javascript
 
 ## HTML
 
