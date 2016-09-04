@@ -31,7 +31,9 @@
       <!--span>2016</span-->
     </div>
 
-    <!--div id="player-controls">
+    <div id="map-container" style="height:40em; border:1px solid #000; margin:2em;"></div>
+
+    <div id="player-controls">
       <button type="button" id="year-play">
         <i class="fa fa-play" aria-hidden="true"></i>
       </button>
@@ -41,9 +43,7 @@
       <button type="button" id="year-restart">
         <i class="fa fa-fast-backward" aria-hidden="true"></i>
       </button>
-    </div-->
-
-    <div id="map-container" style="height:40em; border:1px solid #000; margin:2em;"></div>
+    </div>
 
     <div id="map-footer">
       <p>
@@ -269,55 +269,53 @@
 
         updateMap();
 
-        ////
-        //// CONTROLS
-        ////
+        //
+        // CONTROLS
+        //
 
-        //// PLAY
+        // PLAY
 
-        //var playButton = document.getElementById("year-play");
-        //playButton.addEventListener("click", playYears, false);
+        var playButton = document.getElementById("year-play");
+        playButton.addEventListener("click", playYears, false);
 
-        //var playIntervalId;
+        var playIntervalId;
 
-        //function playYears(){
-        //    console.log("PLAY FROM", yearSelector.value);
-        //    playIntervalId = setInterval(function(){
-        //        if (yearSelector.value == yearSelector.max) {
-        //            console.log("NOT PLAYING")
-        //            pauseYears();
-        //        } else {
-        //            yearSelector.stepUp();
-        //            displayYear();
-        //        };
-        //    }, 2500);
-        //};
+        function playYears(){
+            console.log("PLAY FROM", yearSelector.value);
+            playIntervalId = setInterval(function(){
+                if (yearSelector.value == yearSelector.max) {
+                    console.log("NOT PLAYING")
+                    pauseYears();
+                } else {
+                    yearSelector.stepUp();
+                    displayYear();
+                };
+            }, 2500);
+        };
 
-        //// PAUSE
+        // PAUSE
 
-        //var pauseButton = document.getElementById("year-pause");
-        //pauseButton.addEventListener("click", pauseYears, false);
+        var pauseButton = document.getElementById("year-pause");
+        pauseButton.addEventListener("click", pauseYears, false);
 
-        //function pauseYears(){
-        //    console.log("PAUSE", yearSelector.value)
-        //    clearInterval(playIntervalId);
-        //    playIntervalId = null;
-        //};
+        function pauseYears(){
+            console.log("PAUSE", yearSelector.value)
+            clearInterval(playIntervalId);
+            playIntervalId = null;
+        };
 
-        //// START OVER
+        // START OVER
 
-        //var restartButton = document.getElementById("year-restart");
-        //restartButton.addEventListener("click", restartYears, false);
+        var restartButton = document.getElementById("year-restart");
+        restartButton.addEventListener("click", restartYears, false);
 
-        //function restartYears(){
-        //    console.log("RESTART", yearSelector.value, "TO", yearSelector.defaultValue);
-        //    pauseYears();
-        //    yearSelector.value = yearSelector.defaultValue;
-        //    displayYear();
-        //    playYears();
-        //};
-
-
+        function restartYears(){
+            console.log("RESTART", yearSelector.value, "TO", yearSelector.defaultValue);
+            pauseYears();
+            yearSelector.value = yearSelector.defaultValue;
+            displayYear();
+            playYears();
+        };
 
     </script>
   </body>
