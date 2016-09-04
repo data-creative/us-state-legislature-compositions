@@ -11,13 +11,14 @@
   <body>
     <h1 style="display:inline-block;">
       US State Legislature Compositions
+      &mdash; <span id="dimension-display">Total Seats</span>
       in <span id="year-display">2009</span>
     </h1>
     <div id="year-input-group">
       <label for="year-slider">Select a Year:</label>
-      <span>2009</span>
+      <!--span>2009</span-->
       <input type="range" id="year-slider" min=2009 max=2016 value=2009 step=1 defaultValue=2009>
-      <span>2016</span>
+      <!--span>2016</span-->
 
       <button type="button" id="year-play">
         <i class="fa fa-play" aria-hidden="true"></i>
@@ -28,10 +29,16 @@
       <button type="button" id="year-restart">
         <i class="fa fa-fast-backward" aria-hidden="true"></i>
       </button>
-
+    </div>
+    <div id="dimension-input-group">
+      <label for="dimension-selector">Select a Composition Dimension:</label>
+      <select id="dimension-selector">
+        <option value="seats">Total Seats</option>
+      </select>
     </div>
 
     <div id="map-container" style="height:40em; border:1px solid #000; margin:2em;"></div>
+
     <div id="map-footer">
       <p>
         <a href="http://data-creative.github.io/us-state-legislature-compositions/">view</a> |
