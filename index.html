@@ -55,26 +55,26 @@
         function logMapView(){ console.log("MAP VIEW: [" + map.getCenter().lat + ", " + map.getCenter().lng + "], " + map.getZoom()); };
 
         var map = L.mapbox.map('map-container', 'mapbox.streets', {scrollWheelZoom:false})
-          .setView([40.111688665595956, -97.3388671875], 4)
-          .on("click", logMapClick)
-          .on("dragend", logMapView)
-          .on("zoomend", logMapView);
+            .setView([40.111688665595956, -97.3388671875], 4)
+            .on("click", logMapClick)
+            .on("dragend", logMapView)
+            .on("zoomend", logMapView);
 
         statesData.features.forEach(function(feature){ // includes all states plus DC and PR
-          var stateName = feature.properties.name;
-          var popupContent = "<strong>State</strong>: " + stateName + "<br/>";
-          var state = L.geoJson(feature, {
-              style: {
-                fillColor: 'steelblue',
-                color: "#fff",
-                weight: 1.5,
-                opacity: .85,
-                fillOpacity: .75,
-                className: 'geojson state ' + stateName
-              }
-          });
-          state.bindPopup(popupContent);
-          map.addLayer(state);
+            var stateName = feature.properties.name;
+            var popupContent = "<strong>State</strong>: " + stateName + "<br/>";
+            var state = L.geoJson(feature, {
+                  style: {
+                      fillColor: 'steelblue',
+                      color: "#fff",
+                      weight: 1.5,
+                      opacity: .85,
+                      fillOpacity: .75,
+                      className: 'geojson state ' + stateName
+                  }
+            });
+            state.bindPopup(popupContent);
+            map.addLayer(state);
         });
 
         //
@@ -89,8 +89,8 @@
         inputYear.addEventListener("change", displayYear, false);
 
         function displayYear(){
-          console.log("YEAR: " + inputYear.value);
-          yearDisplay.innerHTML = inputYear.value;
+            console.log(inputYear.value);
+            yearDisplay.innerHTML = inputYear.value;
         };
 
         displayYear();
@@ -98,49 +98,45 @@
         // PLAY
 
         var playButton = document.getElementById("year-play");
-
         playButton.addEventListener("click", playYears, false);
 
         var playIntervalId;
 
         function playYears(){
-          console.log("PLAY FROM", inputYear.value);
-
-          playIntervalId = setInterval(function(){
-            inputYear.stepUp();
-
-            displayYear();
-          }, 2500);
+            console.log("PLAY FROM", inputYear.value);
+            playIntervalId = setInterval(function(){
+                if (inputYear.value == inputYear.max) {
+                    console.log("NOT PLAYING")
+                    pauseYears();
+                } else {
+                    inputYear.stepUp();
+                    displayYear();
+                };
+            }, 2500);
         };
 
         // PAUSE
 
         var pauseButton = document.getElementById("year-pause");
-
         pauseButton.addEventListener("click", pauseYears, false);
 
         function pauseYears(){
-          console.log("PAUSE", inputYear.value)
-
-          clearInterval(playIntervalId);
-
-          playIntervalId = null;
+            console.log("PAUSE", inputYear.value)
+            clearInterval(playIntervalId);
+            playIntervalId = null;
         };
 
         // START OVER
 
         var restartButton = document.getElementById("year-restart");
-
         restartButton.addEventListener("click", restartYears, false);
 
         function restartYears(){
-          console.log("RESTART", inputYear.value, "TO", inputYear.defaultValue);
-
-          pauseYears();
-
-          inputYear.value = inputYear.defaultValue;
-
-          playYears();
+            console.log("RESTART", inputYear.value, "TO", inputYear.defaultValue);
+            pauseYears();
+            inputYear.value = inputYear.defaultValue;
+            displayYear();
+            playYears();
         };
 
 
