@@ -4,58 +4,120 @@
     <meta charset="utf-8">
     <title>US State Legislature Compositions</title>
     <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.css' rel='stylesheet' />
-    <!--link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
   </head>
   <body>
-    <h1 style="display:inline-block;">
-      US State Legislatures
-      by <span id="dimension-display">Size</span>
-      in <span id="year-display">2009</span>
-    </h1>
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-12">
+          <h1>US State Legislatures by <span id="dimension-display">Size</span> in <span id="year-display">2009</span></h1>
+        </div>
+      </div>
 
-    <div id="dimension-input-group" style="margin: 0 2em;">
-      <label for="dimension-selector">Select a Dimension:</label>
-      <select id="dimension-selector" title="Select a composition dimension.">
-        <option value="size">Legislature Size</option>
-        <option value="pct-male">Legislature Percent Male</option>
-        <option value="pct-female">Legislature Percent Female</option>
-        <option value="pct-dem">Legislature Percent Democrat</option>
-        <option value="pct-gop">Legislature Percent Republican</option>
-      </select>
-    </div>
+      <div class="row" style="margin-top:1em;">
+        <div class="col-sm-5">
+          <div class="form-group">
+            <label for="dimension-selector">Select a Composition Dimension:</label>
+            <select id="dimension-selector" class="form-control" title="Select a composition dimension">
+              <option value="size">Size</option>
+              <option value="pct-male">Percent Male</option>
+              <option value="pct-female">Percent Female</option>
+              <option value="pct-dem">Percent Democrat</option>
+              <option value="pct-gop">Percent Republican</option>
+            </select>
+          </div>
+        </div>
 
-    <div id="year-input-group" style="margin: 0 2em;">
-      <label for="year-slider">Select a Year:</label>
-      <!--span>2009</span-->
-      <input type="range" id="year-slider" title="Select a year." min=2009 max=2016 value=2009 step=1 defaultValue=2009>
-      <!--span>2016</span-->
-    </div>
+        <div class="col-sm-5">
+          <div class="form-group">
+            <label for="year-slider">Select a Year (2009 to 2016):</label>
+            <input type="range" id="year-slider" class="form-control" title="Select a year" min=2009 max=2016 value=2009 step=1 defaultValue=2009>
+          </div>
+        </div>
 
-    <div id="player-controls" style="margin: 0 2em;">
-      <span>Year Player Controls:</span>
-      <button type="button" id="year-play">
-        <i class="fa fa-play" aria-hidden="true"></i>
-      </button>
-      <button type="button" id="year-pause">
-        <i class="fa fa-pause" aria-hidden="true"></i>
-      </button>
-      <button type="button" id="year-restart">
-        <i class="fa fa-fast-backward" aria-hidden="true"></i>
-      </button>
-    </div>
+        <div class="col-sm-2">
+          <div style="margin-bottom:5px;">
+            <strong>Year Player:</strong>
+          </div>
 
-    <div id="map-container" style="height:40em; border:1px solid #000; margin:2em;"></div>
+          <button type="button" id="year-play" class="btn btn-sm btn-default">
+            <i class="fa fa-play" aria-hidden="true"></i>
+          </button>
+          <button type="button" id="year-pause" class="btn btn-sm btn-default">
+            <i class="fa fa-pause" aria-hidden="true"></i>
+          </button>
+          <button type="button" id="year-restart" class="btn btn-sm btn-default">
+            <i class="fa fa-fast-backward" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
 
-    <div id="map-footnotes" style="margin:2em;">
-      <p id="partisanship-footnote"></p>
-    </div>
+      <div class="row" style="margin-top:0; margin-bottom:2em;">
+        <div class="col-sm-12">
+          <div id="map-container" style="height:40em; border:1px solid #000;"></div>
+        </div>
+      </div>
 
-    <div id="map-footer">
-      <p>
-        <a href="http://data-creative.github.io/us-state-legislature-compositions/">view</a> |
-        <a href="https://github.com/data-creative/us-state-legislature-compositions">source</a> |
-        <a href="https://github.com/dwillis/state_legislatures">data</a>
-      </p>
+      <div class="row">
+        <div class="col-sm-6">
+          <table id="top-10-table" class="table table-responsive table-hover table-striped">
+            <caption class="lead">Top 10 Legislatures by DIMENSION in YEAR</caption>
+            <thead>
+              <tr><th>State Name</th><th>Percent Women</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>New Hampshire</td><td>45%</td></tr>
+              <tr><td>Colorado</td><td>40%</td></tr>
+              <tr><td>My State</td><td>20%</td></tr>
+              <tr><td>My State</td><td>20%</td></tr>
+              <tr><td>My State</td><td>20%</td></tr>
+              <tr><td>My State</td><td>20%</td></tr>
+              <tr><td>My State</td><td>20%</td></tr>
+              <tr><td>My State</td><td>20%</td></tr>
+              <tr><td>My State</td><td>20%</td></tr>
+              <tr><td>My State</td><td>20%</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="col-sm-6">
+          <table id="bottom-10-table" class="table table-responsive table-hover table-striped">
+            <caption class="lead">Bottom 10 Legislatures DIMENSION in YEAR</caption>
+            <thead>
+              <tr><th>State Name</th><th>Percent Women</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Wyoming</td><td>10%</td></tr>
+              <tr><td>Utah</td><td>12%</td></tr>
+              <tr><td>My State</td><td>20%</td></tr>
+              <tr><td>My State</td><td>20%</td></tr>
+              <tr><td>My State</td><td>20%</td></tr>
+              <tr><td>My State</td><td>20%</td></tr>
+              <tr><td>My State</td><td>20%</td></tr>
+              <tr><td>My State</td><td>20%</td></tr>
+              <tr><td>My State</td><td>20%</td></tr>
+              <tr><td>My State</td><td>20%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="map-footnotes" class="row">
+        <div class="col-sm-12">
+          <p id="partisanship-footnote"></p>
+        </div>
+      </div>
+
+      <footer class="row">
+        <hr>
+        <div class="col-sm-12" style="margin-top:2em; margin-bottom:2em;">
+          <p>
+            <a href="http://data-creative.github.io/us-state-legislature-compositions/">view</a> |
+            <a href="https://github.com/data-creative/us-state-legislature-compositions">source</a> |
+            <a href="https://github.com/dwillis/state_legislatures">data</a>
+          </p>
+        </div>
+      </div>
     </div>
 
     <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.js'></script>
@@ -360,7 +422,7 @@
             pauseYears();
             yearSelector.value = yearSelector.defaultValue;
             displayYear();
-            playYears();
+            //playYears();
         };
 
     </script>
