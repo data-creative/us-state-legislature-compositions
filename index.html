@@ -176,7 +176,7 @@
         function displayPartisanshipFootnote() {
             var selectedDimensionValue = dimensionSelector.value;
             if (selectedDimensionValue.includes("dem") || selectedDimensionValue.includes("gop")) {
-                partisanshipFootnote.innerHTML = "NOTE: Nebraska's legislature is <a href='https://en.wikipedia.org/wiki/Nebraska_Legislature#Selection.2C_composition_and_operation' target='wikipedia'>technically nonpartisan</a>.";
+                partisanshipFootnote.innerHTML = "Note: Nebraska's legislature is technically <a href='https://en.wikipedia.org/wiki/Nebraska_Legislature#Selection.2C_composition_and_operation' target='wikipedia'>nonpartisan</a>.";
             } else {
                 partisanshipFootnote.innerHTML = "";
             };
@@ -257,7 +257,7 @@
                 featureCollection.features.forEach(function(feature){
                     var stateName = feature.properties.name;
                     var compositionValue = lookupValue(response["states"], stateName);
-                    if (compositionValue) {
+                    if (compositionValue || compositionValue == 0) {
                         var popupContent = "<strong>State</strong>: " + stateName
                             + "<br/>" + "<strong>Year</strong>: " + selectedYear
                             + "<br/>" + "<strong>" + selectedDimensionTitle + "</strong>: " + compositionValue + compositionValueSuffix()
