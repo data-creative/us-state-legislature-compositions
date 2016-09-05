@@ -233,9 +233,7 @@
                 //    valuesArray =
                 //    break;
                 case "pct-female":
-                    valuesArray = statesArray.map(function(stateObj){
-                        return +((stateObj["total_women"] / stateObj["total_seats"]) * 100).toFixed(2)
-                    });
+                    valuesArray = statesArray.map(function(stateObj){ return pctFemale(stateObj); });
                     break;
                 default:
                     valuesArray = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9] // todo: get rid of this default value
@@ -262,13 +260,17 @@
                     //    valuesArray =
                     //    break;
                     case "pct-female":
-                        value = +((stateObj["total_women"] / stateObj["total_seats"]) * 100).toFixed(2)
+                        value = pctFemale(stateObj);
                         break;
                     default:
                         value = 0.7
                 };
             };
             return value;
+        };
+
+        function pctFemale(stateObj){
+          return +((stateObj["total_women"] / stateObj["total_seats"]) * 100).toFixed(2)
         };
 
         function compositionValueSuffix(){
