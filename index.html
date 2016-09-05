@@ -10,7 +10,7 @@
     <div class="container">
       <div class="row">
         <div class="col-sm-12">
-          <h1>US State Legislatures by <span id="dimension-display">Size</span> in <span id="year-display">2009</span></h1>
+          <h1>US State Legislatures by <span class="dimension-display">Size</span> in <span class="year-display">2009</span></h1>
         </div>
       </div>
 
@@ -61,7 +61,7 @@
       <div class="row">
         <div class="col-sm-6">
           <table id="top-10-table" class="table table-responsive table-hover table-striped">
-            <caption class="lead">Top 10 Legislatures by DIMENSION in YEAR</caption>
+            <caption class="lead">Top 10 Legislatures by <span class="dimension-display">Size</span> in <span class="year-display">2009</span></caption>
             <thead>
               <tr><th>State Name</th><th>Percent Women</th></tr>
             </thead>
@@ -82,7 +82,7 @@
 
         <div class="col-sm-6">
           <table id="bottom-10-table" class="table table-responsive table-hover table-striped">
-            <caption class="lead">Bottom 10 Legislatures DIMENSION in YEAR</caption>
+            <caption class="lead">Bottom 10 Legislatures by <span class="dimension-display">Size</span> in <span class="year-display">2009</span></caption>
             <thead>
               <tr><th>State Name</th><th>Percent Women</th></tr>
             </thead>
@@ -133,7 +133,7 @@
 
         // YEAR
 
-        var yearDisplay = document.getElementById("year-display");
+        var yearDisplays = document.getElementsByClassName("year-display");
         var yearSelector = document.getElementById('year-slider');
         yearSelector.addEventListener("change", selectYear, false);
 
@@ -145,14 +145,16 @@
         function displayYear(){
             var selectedYear = yearSelector.value;
             console.log("YEAR", selectedYear);
-            yearDisplay.innerHTML = selectedYear;
+            Array.prototype.forEach.call(yearDisplays, function(yearDisplay) {
+                yearDisplay.innerHTML = selectedYear;
+            });
         };
 
         displayYear();
 
         // DIMENSION
 
-        var dimensionDisplay = document.getElementById("dimension-display");
+        var dimensionDisplays = document.getElementsByClassName("dimension-display");
         var partisanshipFootnote = document.getElementById("partisanship-footnote");
         var dimensionSelector = document.getElementById('dimension-selector');
         dimensionSelector.addEventListener("change", selectDimension, false);
@@ -166,7 +168,9 @@
         function displayDimension(){
           var selectedDimensionTitle = dimensionSelector[dimensionSelector.selectedIndex].textContent.trim();
           console.log("DIMENSION", selectedDimensionTitle)
-          dimensionDisplay.innerHTML = selectedDimensionTitle;
+          Array.prototype.forEach.call(dimensionDisplays, function(dimensionDisplay) {
+              dimensionDisplay.innerHTML = selectedDimensionTitle;
+          });
         };
 
         function displayPartisanshipFootnote() {
