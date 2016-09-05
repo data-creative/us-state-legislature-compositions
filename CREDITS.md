@@ -22,6 +22,7 @@
   + http://www.w3schools.com/jsref/prop_html_innerhtml.asp
   + http://www.w3schools.com/jsref/met_win_settimeout.asp
   + http://www.w3schools.com/tags/tag_label.asp
+  + http://stackoverflow.com/questions/2343927/how-to-make-html-open-a-hyperlink-in-another-window-or-tab
 
 ## Colors
 
