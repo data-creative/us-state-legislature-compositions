@@ -160,26 +160,26 @@
         dimensionSelector.addEventListener("change", selectDimension, false);
 
         function selectDimension(){
-          displayDimension();
-          displayPartisanshipFootnote();
-          updateMap();
+            displayDimension();
+            displayPartisanshipFootnote();
+            updateMap();
         };
 
         function displayDimension(){
-          var selectedDimensionTitle = dimensionSelector[dimensionSelector.selectedIndex].textContent.trim();
-          console.log("DIMENSION", selectedDimensionTitle)
-          Array.prototype.forEach.call(dimensionDisplays, function(dimensionDisplay) {
-              dimensionDisplay.innerHTML = selectedDimensionTitle;
-          });
+            var selectedDimensionTitle = dimensionSelector[dimensionSelector.selectedIndex].textContent.trim();
+            console.log("DIMENSION", selectedDimensionTitle)
+            Array.prototype.forEach.call(dimensionDisplays, function(dimensionDisplay) {
+                dimensionDisplay.innerHTML = selectedDimensionTitle;
+            });
         };
 
         function displayPartisanshipFootnote() {
-          var selectedDimensionValue = dimensionSelector.value;
-          if (selectedDimensionValue.includes("dem") || selectedDimensionValue.includes("gop")) {
-            partisanshipFootnote.innerHTML = "NOTE: Nebraska's legislature is <a href='https://en.wikipedia.org/wiki/Nebraska_Legislature#Selection.2C_composition_and_operation' target='wikipedia'>technically nonpartisan</a>.";
-          } else {
-            partisanshipFootnote.innerHTML = "";
-          };
+            var selectedDimensionValue = dimensionSelector.value;
+            if (selectedDimensionValue.includes("dem") || selectedDimensionValue.includes("gop")) {
+                partisanshipFootnote.innerHTML = "NOTE: Nebraska's legislature is <a href='https://en.wikipedia.org/wiki/Nebraska_Legislature#Selection.2C_composition_and_operation' target='wikipedia'>technically nonpartisan</a>.";
+            } else {
+                partisanshipFootnote.innerHTML = "";
+            };
         };
 
         displayDimension();
@@ -372,9 +372,9 @@
         function compositionValueSuffix(){
             var selectedDimensionValue = dimensionSelector.value;
             if (selectedDimensionValue.includes("pct")) {
-              return "%"
+                return "%"
             } else {
-              return " seats"
+                return " seats"
             };
         };
 
