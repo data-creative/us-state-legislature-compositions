@@ -229,9 +229,9 @@
                 //case "pct-gop":
                 //    valuesArray =
                 //    break;
-                //case "pct-male":
-                //    valuesArray =
-                //    break;
+                case "pct-male":
+                    valuesArray = statesArray.map(function(stateObj){ return pctMale(stateObj); });
+                    break;
                 case "pct-female":
                     valuesArray = statesArray.map(function(stateObj){ return pctFemale(stateObj); });
                     break;
@@ -256,9 +256,9 @@
                     //case "pct-gop":
                     //    valuesArray =
                     //    break;
-                    //case "pct-male":
-                    //    valuesArray =
-                    //    break;
+                    case "pct-male":
+                        value = pctMale(stateObj);
+                        break;
                     case "pct-female":
                         value = pctFemale(stateObj);
                         break;
@@ -270,7 +270,11 @@
         };
 
         function pctFemale(stateObj){
-          return +((stateObj["total_women"] / stateObj["total_seats"]) * 100).toFixed(2)
+          return +(stateObj["total_women"] / stateObj["total_seats"] * 100).toFixed(2)
+        };
+
+        function pctMale(stateObj){
+          return +((stateObj["total_seats"] - stateObj["total_women"]) / stateObj["total_seats"] * 100).toFixed(2)
         };
 
         function compositionValueSuffix(){
