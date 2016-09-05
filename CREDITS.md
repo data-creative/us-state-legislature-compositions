@@ -14,6 +14,7 @@
 
   + https://github.com/airbnb/javascript#classes--constructors
   + http://stackoverflow.com/questions/109086/stop-setinterval-call-in-javascript
+  + http://stackoverflow.com/questions/15762768/javascript-math-round-to-two-decimal-places
 
 ## HTML
 

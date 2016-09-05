@@ -15,7 +15,7 @@
 
     <div id="dimension-input-group">
       <label for="dimension-selector">Select a Dimension:</label>
-      <select id="dimension-selector">
+      <select id="dimension-selector" title="Select a composition dimension.">
         <option value="size">Legislature Size</option>
         <option value="pct-male">Legislature Percent Male</option>
         <option value="pct-female">Legislature Percent Female</option>
@@ -27,7 +27,7 @@
     <div id="year-input-group">
       <label for="year-slider">Select a Year:</label>
       <!--span>2009</span-->
-      <input type="range" id="year-slider" min=2009 max=2016 value=2009 step=1 defaultValue=2009>
+      <input type="range" id="year-slider" title="Select a year." min=2009 max=2016 value=2009 step=1 defaultValue=2009>
       <!--span>2016</span-->
     </div>
 
@@ -178,7 +178,7 @@
                     if (compositionValue) {
                         var popupContent = "<strong>State</strong>: " + stateName
                             + "<br/>" + "<strong>Year</strong>: " + selectedYear
-                            + "<br/>" + "<strong>" + selectedDimensionTitle + "</strong>: " + compositionValue
+                            + "<br/>" + "<strong>" + selectedDimensionTitle + "</strong>: " + compositionValue + compositionValueSuffix()
 
                         var stateLayer = L.geoJson(feature, {
                               style: {
@@ -232,11 +232,13 @@
                 //case "pct-male":
                 //    valuesArray =
                 //    break;
-                //case "pct-female":
-                //    valuesArray =
-                //    break;
+                case "pct-female":
+                    valuesArray = statesArray.map(function(stateObj){
+                        return +((stateObj["total_women"] / stateObj["total_seats"]) * 100).toFixed(2)
+                    });
+                    break;
                 default:
-                    valuesArray = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+                    valuesArray = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9] // todo: get rid of this default value
             };
             return valuesArray;
         };
@@ -245,26 +247,37 @@
             var value;
             var selectedDimensionValue = dimensionSelector.value;
             var stateObj = statesArray.find(function(stateObj){ return stateObj["name"] == stateName; });
-            switch(selectedDimensionValue){
-                case "size":
-                    value = stateObj["legislature_seats"];
-                    break;
-                //case "pct-dem":
-                //    valuesArray =
-                //    break;
-                //case "pct-gop":
-                //    valuesArray =
-                //    break;
-                //case "pct-male":
-                //    valuesArray =
-                //    break;
-                //case "pct-female":
-                //    valuesArray =
-                //    break;
-                default:
-                    value = 0.7
+            if (stateObj) {
+                switch(selectedDimensionValue){
+                    case "size":
+                        value = stateObj["legislature_seats"];
+                        break;
+                    //case "pct-dem":
+                    //    valuesArray =
+                    //    break;
+                    //case "pct-gop":
+                    //    valuesArray =
+                    //    break;
+                    //case "pct-male":
+                    //    valuesArray =
+                    //    break;
+                    case "pct-female":
+                        value = +((stateObj["total_women"] / stateObj["total_seats"]) * 100).toFixed(2)
+                        break;
+                    default:
+                        value = 0.7
+                };
             };
             return value;
+        };
+
+        function compositionValueSuffix(){
+            var selectedDimensionValue = dimensionSelector.value;
+            if (selectedDimensionValue.includes("pct")) {
+              return "%"
+            } else {
+              return " seats"
+            };
         };
 
         updateMap();
