@@ -17,6 +17,13 @@
   + http://stackoverflow.com/questions/15762768/javascript-math-round-to-two-decimal-places
   + http://stackoverflow.com/questions/3871547/js-iterating-over-result-of-getelementsbyclassname-using-array-foreach
 
+### d3
+
+  + https://bost.ocks.org/mike/nest/
+  + https://bost.ocks.org/mike/join/
+  + http://bl.ocks.org/mbostock/3808218
+  + https://github.com/s2t2/lsat-curve/blob/master/index.html
+
 ## HTML
 
   + http://www.w3schools.com/jsref/dom_obj_range.asp

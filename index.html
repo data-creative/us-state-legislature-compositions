@@ -10,7 +10,7 @@
     <div class="container">
       <div class="row">
         <div class="col-sm-12">
-          <h1>US State Legislatures by <span class="dimension-display">Size</span> in <span class="year-display">2009</span></h1>
+          <h1>US State Legislatures by <span class="dimension-display">Loading</span> in <span class="year-display">Loading</span></h1>
         </div>
       </div>
 
@@ -21,7 +21,7 @@
             <select id="dimension-selector" class="form-control" title="Select a composition dimension">
               <option value="size">Size</option>
               <option value="pct-male">Percent Male</option>
-              <option value="pct-female">Percent Female</option>
+              <option value="pct-female" selected=true>Percent Female</option>
               <option value="pct-dem">Percent Democrat</option>
               <option value="pct-gop">Percent Republican</option>
             </select>
@@ -61,11 +61,12 @@
       <div class="row">
         <div class="col-sm-6">
           <table id="top" class="table table-responsive table-hover table-striped">
-            <caption class="lead">Top Legislatures by <span class="dimension-display">Size</span> in <span class="year-display">2009</span></caption>
+            <caption class="lead">Top Legislatures by <span class="dimension-display">Loading</span> in <span class="year-display">Loading</span></caption>
             <thead>
-              <tr><th>State Name</th><th><span class="dimension-display">Size</span></th></tr>
+              <tr><th>State Name</th><th><span class="dimension-display">Loading</span></th></tr>
             </thead>
             <tbody>
+              <tr><td>Loading</td><td>Loading</td></tr>
               <tr><td>Loading</td><td>Loading</td></tr>
               <tr><td>Loading</td><td>Loading</td></tr>
             </tbody>
@@ -74,11 +75,12 @@
 
         <div class="col-sm-6">
           <table id="bottom" class="table table-responsive table-hover table-striped">
-            <caption class="lead">Bottom Legislatures by <span class="dimension-display">Size</span> in <span class="year-display">2009</span></caption>
+            <caption class="lead">Bottom Legislatures by <span class="dimension-display">Loading</span> in <span class="year-display">Loading</span></caption>
             <thead>
-              <tr><th>State Name</th><th><span class="dimension-display">Size</span></th></tr>
+              <tr><th>State Name</th><th><span class="dimension-display">Loading</span></th></tr>
             </thead>
             <tbody>
+              <tr><td>Loading</td><td>Loading</td></tr>
               <tr><td>Loading</td><td>Loading</td></tr>
               <tr><td>Loading</td><td>Loading</td></tr>
             </tbody>
@@ -210,6 +212,11 @@
         //
 
         var featureCollection = statesData; // see: us-states.js ... includes all states plus DC and PR
+
+        function featureNames(){
+          return featureCollection.features.map(function(f){ return f.properties.name });
+        }
+
         L.mapbox.accessToken = 'pk.eyJ1IjoiczJ0MiIsImEiOiJQVFE0UW1JIn0.0MfEvAJVxFx7BLGoL0USXA';
         function logMapClick(cc){ console.log("MAP CLICKED ON GEOLOCATION: [" + cc.latlng.lat + ", " + cc.latlng.lng + "]"); };
         function logMapView(){ console.log("MAP VIEW: [" + map.getCenter().lat + ", " + map.getCenter().lng + "], " + map.getZoom()); };
@@ -234,10 +241,14 @@
             var requestUrl = compileRequestUrl();
             d3.json(requestUrl, function(err, response){
                 console.log("RESPONSE", response["year"], response["states"].length)
-                var sortedResponseObjects = response["states"].sort(function(a, b){
-                  return d3.descending(measureValue(a), measureValue(b))
+                var sortedFilteredResponseObjects = response["states"].filter(function(stateObj){
+                    return featureNames().includes(stateObj["name"]); // exclude non-mappable data elements
+                }).sort(function(a, b){
+                    return d3.descending(measureValue(a), measureValue(b))
                 });
-                zz = sortedResponseObjects // response["states"]; // for debugging in the console
+
+
+                zz = sortedFilteredResponseObjects // response["states"]; // for debugging in the console
 
                 calibrateColorScale(lookupAllValues(response["states"]));
 
@@ -266,14 +277,14 @@
 
                 var topTableRows;
                 topTableRows = d3.select("table#top").select("tbody").selectAll("tr")
-                    .data(sortedResponseObjects.slice(0,10))
+                    .data(sortedFilteredResponseObjects.slice(0,10))
                 updateRows(topTableRows)
                 enterRows(topTableRows)
                 topTableRows.exit().remove();
 
                 var bottomTableRows;
                 bottomTableRows = d3.select("table#bottom").select("tbody").selectAll("tr")
-                    .data(sortedResponseObjects.slice(-10).reverse())
+                    .data(sortedFilteredResponseObjects.slice(-10).reverse())
                 updateRows(bottomTableRows)
                 enterRows(bottomTableRows)
                 bottomTableRows.exit().remove();
