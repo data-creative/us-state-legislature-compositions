@@ -235,7 +235,7 @@
             d3.json(requestUrl, function(err, response){
                 console.log("RESPONSE", response["year"], response["states"].length)
                 var sortedResponseObjects = response["states"].sort(function(a, b){
-                  return d3.descending(a["legislature_seats"], b[["legislature_seats"]])
+                  return d3.descending(measureValue(a), measureValue(b))
                 });
                 zz = sortedResponseObjects // response["states"]; // for debugging in the console
 
@@ -264,68 +264,36 @@
                     };
                 });
 
-
-
-
-
-
-
-
-                var topRows;
-
-
-                topRows = d3.select("table#top").select("tbody").selectAll("tr")
+                var topTableRows;
+                topTableRows = d3.select("table#top").select("tbody").selectAll("tr")
                     .data(sortedResponseObjects.slice(0,10))
+                updateRows(topTableRows)
+                enterRows(topTableRows)
+                topTableRows.exit().remove();
 
-
-                topRows
-                    .each(function(stateObj){
-                        d3.select(this).selectAll("td").remove()
-                        d3.select(this).append("td").text(stateObj["name"]);
-                        d3.select(this).append("td").text(measureValue(stateObj) + compositionValueSuffix());
-                    })
-
-                topRows.enter().append("tr")
-                    .attr("class", "top")
-                    .each(function(stateObj){
-                        d3.select(this).append("td").text(stateObj["name"]);
-                        d3.select(this).append("td").text(measureValue(stateObj) + compositionValueSuffix());
-                    })
-
-
-                topRows.exit().remove();
-
-
-
-
-
-
-
-/*
-
-                var bottomTableBody = d3.select("tbody#bottom")
-                var bottomRows = bottomTableBody.selectAll("tr.bottom")
-                    .data(sortedResponseObjects.slice(-10))
-
-                bottomRows.enter().append("tr")
-                        .attr("class", "bottom")
-
-                bottomRows.append("td").text(function(stateObj){
-                    return stateObj["name"] // compositionValue(stateObj)
-                });
-
-                bottomRows.append("td").text(function(stateObj){
-                    return 5 // compositionValue(stateObj)
-                });
-
-                bottomRows.exit().remove();
-
-                */
-
-
-
-
+                var bottomTableRows;
+                bottomTableRows = d3.select("table#bottom").select("tbody").selectAll("tr")
+                    .data(sortedResponseObjects.slice(-10).reverse())
+                updateRows(bottomTableRows)
+                enterRows(bottomTableRows)
+                bottomTableRows.exit().remove();
             });
+        };
+
+        function updateRows(tableRows){
+          tableRows.each(function(stateObj){
+              d3.select(this).selectAll("td").remove();
+              d3.select(this).append("td").text(stateObj["name"]);
+              d3.select(this).append("td").text(measureValue(stateObj) + compositionValueSuffix());
+          });
+        };
+
+        function enterRows(tableRows){
+            tableRows
+                .enter().append("tr").each(function(stateObj){
+                    d3.select(this).append("td").text(stateObj["name"]);
+                    d3.select(this).append("td").text(measureValue(stateObj) + compositionValueSuffix());
+                });
         };
 
         var urlBase = "https://raw.githubusercontent.com/data-creative/state_legislatures/master/data/";
