@@ -271,8 +271,19 @@
 
 
 
-                var topRows = d3.select("table#top").select("tbody").selectAll("tr")
+                var topRows;
+
+
+                topRows = d3.select("table#top").select("tbody").selectAll("tr")
                     .data(sortedResponseObjects.slice(0,10))
+
+
+                topRows
+                    .each(function(stateObj){
+                        d3.select(this).selectAll("td").remove()
+                        d3.select(this).append("td").text(stateObj["name"]);
+                        d3.select(this).append("td").text(measureValue(stateObj) + compositionValueSuffix());
+                    })
 
                 topRows.enter().append("tr")
                     .attr("class", "top")
@@ -281,7 +292,9 @@
                         d3.select(this).append("td").text(measureValue(stateObj) + compositionValueSuffix());
                     })
 
+
                 topRows.exit().remove();
+
 
 
 
