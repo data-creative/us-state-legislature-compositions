@@ -32,6 +32,8 @@
   + http://www.w3schools.com/tags/tag_label.asp
   + http://stackoverflow.com/questions/2343927/how-to-make-html-open-a-hyperlink-in-another-window-or-tab
 
-## Colors
+## Style
 
   + https://bl.ocks.org/mbostock/5577023
+  + http://getbootstrap.com/css/#grid-options
+  + http://getbootstrap.com/components/#input-groups
