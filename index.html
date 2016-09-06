@@ -10,15 +10,15 @@
     <div class="container">
       <div class="row">
         <div class="col-sm-12">
-          <h1>US State Legislatures by <span class="dimension-display">Loading</span> in <span class="year-display">Loading</span></h1>
+          <h1>US State Legislatures by <span class="metric-display">Loading</span> in <span class="year-display">Loading</span></h1>
         </div>
       </div>
 
       <div class="row" style="margin-top:1em;">
         <div class="col-sm-5">
           <div class="form-group">
-            <label for="dimension-selector">Select a Composition Dimension:</label>
-            <select id="dimension-selector" class="form-control" title="Select a composition dimension">
+            <label for="metric-selector">Select a Metric:</label>
+            <select id="metric-selector" class="form-control" title="Select a metric">
               <option value="size">Size</option>
               <option value="pct-male">Percent Male</option>
               <option value="pct-female" selected=true>Percent Female</option>
@@ -61,9 +61,9 @@
       <div class="row">
         <div class="col-sm-6">
           <table id="top" class="table table-responsive table-hover table-striped">
-            <caption class="lead">Top Legislatures by <span class="dimension-display">Loading</span> in <span class="year-display">Loading</span></caption>
+            <caption class="lead">Top Legislatures by <span class="metric-display">Loading</span> in <span class="year-display">Loading</span></caption>
             <thead>
-              <tr><th>State Name</th><th><span class="dimension-display">Loading</span></th></tr>
+              <tr><th>State Name</th><th><span class="metric-display">Loading</span></th></tr>
             </thead>
             <tbody>
               <tr><td>Loading</td><td>Loading</td></tr>
@@ -75,9 +75,9 @@
 
         <div class="col-sm-6">
           <table id="bottom" class="table table-responsive table-hover table-striped">
-            <caption class="lead">Bottom Legislatures by <span class="dimension-display">Loading</span> in <span class="year-display">Loading</span></caption>
+            <caption class="lead">Bottom Legislatures by <span class="metric-display">Loading</span> in <span class="year-display">Loading</span></caption>
             <thead>
-              <tr><th>State Name</th><th><span class="dimension-display">Loading</span></th></tr>
+              <tr><th>State Name</th><th><span class="metric-display">Loading</span></th></tr>
             </thead>
             <tbody>
               <tr><td>Loading</td><td>Loading</td></tr>
@@ -138,37 +138,37 @@
 
         displayYear();
 
-        // DIMENSION
+        // METRIC
 
-        var dimensionDisplays = document.getElementsByClassName("dimension-display");
-        var partisanshipFootnote = document.getElementById("partisanship-footnote");
-        var dimensionSelector = document.getElementById('dimension-selector');
-        dimensionSelector.addEventListener("change", selectDimension, false);
+        var metricSelector = document.getElementById('metric-selector');
+        metricSelector.addEventListener("change", selectMetric, false);
 
-        function selectDimension(){
-            displayDimension();
+        function selectMetric(){
+            displayMetric();
             displayPartisanshipFootnote();
             updateMap();
         };
 
-        function displayDimension(){
-            var selectedDimensionTitle = dimensionSelector[dimensionSelector.selectedIndex].textContent.trim();
-            console.log("DIMENSION", selectedDimensionTitle)
-            Array.prototype.forEach.call(dimensionDisplays, function(dimensionDisplay) {
-                dimensionDisplay.innerHTML = selectedDimensionTitle;
+        function displayMetric(){
+            var metricDisplays = document.getElementsByClassName("metric-display");
+            var selectedMetricTitle = metricSelector[metricSelector.selectedIndex].textContent.trim();
+            console.log("METRIC", selectedMetricTitle)
+            Array.prototype.forEach.call(metricDisplays, function(metricDisplay) {
+                metricDisplay.innerHTML = selectedMetricTitle;
             });
         };
 
         function displayPartisanshipFootnote() {
-            var selectedDimensionValue = dimensionSelector.value;
-            if (selectedDimensionValue.includes("dem") || selectedDimensionValue.includes("gop")) {
+            var partisanshipFootnote = document.getElementById("partisanship-footnote");
+            var selectedMetricValue = metricSelector.value;
+            if (selectedMetricValue.includes("dem") || selectedMetricValue.includes("gop")) {
                 partisanshipFootnote.innerHTML = "Note: Nebraska's legislature is technically <a href='https://en.wikipedia.org/wiki/Nebraska_Legislature#Selection.2C_composition_and_operation' target='wikipedia'>nonpartisan</a>.";
             } else {
                 partisanshipFootnote.innerHTML = "";
             };
         };
 
-        displayDimension();
+        displayMetric();
 
         //
         // COLORS
@@ -177,9 +177,9 @@
         var colorScale = d3.scale.linear();
 
         function setColorPalette(){
-            var selectedDimensionValue = dimensionSelector.value;
+            var selectedMetricValue = metricSelector.value;
             var palette;
-            switch(selectedDimensionValue){
+            switch(selectedMetricValue){
                 case "size":
                     palette = colorbrewer.Greys[9]
                     break;
@@ -226,8 +226,8 @@
         function updateMap(){
             console.log("UPDATE MAP");
             var selectedYear = yearSelector.value;
-            var selectedDimensionValue = dimensionSelector.value;
-            var selectedDimensionTitle = dimensionSelector[dimensionSelector.selectedIndex].textContent.trim();
+            var selectedMetricValue = metricSelector.value;
+            var selectedMetricTitle = metricSelector[metricSelector.selectedIndex].textContent.trim();
 
             if (typeof(map) != "undefined") { map.remove(); };
             map = L.mapbox.map('map-container', 'mapbox.streets', {scrollWheelZoom:false})
@@ -258,7 +258,7 @@
                     if (compositionValue || compositionValue == 0) {
                         var popupContent = "<strong>State</strong>: " + stateName
                             + "<br/>" + "<strong>Year</strong>: " + selectedYear
-                            + "<br/>" + "<strong>" + selectedDimensionTitle + "</strong>: " + compositionValue + compositionValueSuffix()
+                            + "<br/>" + "<strong>" + selectedMetricTitle + "</strong>: " + compositionValue + compositionValueSuffix()
 
                         var stateLayer = L.geoJson(feature, {
                               style: {
@@ -310,9 +310,9 @@
         var urlBase = "https://raw.githubusercontent.com/data-creative/state_legislatures/master/data/";
         function compileRequestUrl(){
             var selectedYear = yearSelector.value;
-            var selectedDimensionValue = dimensionSelector.value;
+            var selectedMetricValue = metricSelector.value;
             var url;
-            switch(selectedDimensionValue){
+            switch(selectedMetricValue){
                 case "size":
                 case "pct-dem":
                 case "pct-gop":
@@ -328,8 +328,8 @@
 
         function lookupAllValues(statesArray){
             var valuesArray;
-            var selectedDimensionValue = dimensionSelector.value;
-            switch(selectedDimensionValue){
+            var selectedMetricValue = metricSelector.value;
+            switch(selectedMetricValue){
                 case "size":
                     valuesArray = statesArray.map(function(stateObj){ return seatCount(stateObj) });
                     break;
@@ -353,10 +353,10 @@
 
         function lookupValue(statesArray, stateName){
             var value;
-            var selectedDimensionValue = dimensionSelector.value;
+            var selectedMetricValue = metricSelector.value;
             var stateObj = statesArray.find(function(stateObj){ return stateObj["name"] == stateName; });
             if (stateObj) {
-                switch(selectedDimensionValue){
+                switch(selectedMetricValue){
                     case "size":
                         value = seatCount(stateObj);
                         break;
@@ -379,7 +379,7 @@
 
         function measureValue(stateObj){
           var value;
-          switch(dimensionSelector.value){
+          switch(metricSelector.value){
               case "size":
                   value = seatCount(stateObj);
                   break;
@@ -422,8 +422,8 @@
         };
 
         function compositionValueSuffix(){
-            var selectedDimensionValue = dimensionSelector.value;
-            if (selectedDimensionValue.includes("pct")) {
+            var selectedMetricValue = metricSelector.value;
+            if (selectedMetricValue.includes("pct")) {
                 return "%"
             } else {
                 return " seats"
@@ -477,8 +477,7 @@
             console.log("RESTART", yearSelector.value, "TO", yearSelector.defaultValue);
             pauseYears();
             yearSelector.value = yearSelector.defaultValue;
-            displayYear();
-            //playYears();
+            selectYear();
         };
 
     </script>
