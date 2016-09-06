@@ -60,43 +60,27 @@
 
       <div class="row">
         <div class="col-sm-6">
-          <table id="top-10-table" class="table table-responsive table-hover table-striped">
-            <caption class="lead">Top 10 Legislatures by <span class="dimension-display">Size</span> in <span class="year-display">2009</span></caption>
+          <table id="top" class="table table-responsive table-hover table-striped">
+            <caption class="lead">Top Legislatures by <span class="dimension-display">Size</span> in <span class="year-display">2009</span></caption>
             <thead>
-              <tr><th>State Name</th><th>Percent Women</th></tr>
+              <tr><th>State Name</th><th><span class="dimension-display">Size</span></th></tr>
             </thead>
             <tbody>
-              <tr><td>New Hampshire</td><td>45%</td></tr>
-              <tr><td>Colorado</td><td>40%</td></tr>
-              <tr><td>My State</td><td>20%</td></tr>
-              <tr><td>My State</td><td>20%</td></tr>
-              <tr><td>My State</td><td>20%</td></tr>
-              <tr><td>My State</td><td>20%</td></tr>
-              <tr><td>My State</td><td>20%</td></tr>
-              <tr><td>My State</td><td>20%</td></tr>
-              <tr><td>My State</td><td>20%</td></tr>
-              <tr><td>My State</td><td>20%</td></tr>
+              <tr><td>Loading</td><td>Loading</td></tr>
+              <tr><td>Loading</td><td>Loading</td></tr>
             </tbody>
           </table>
         </div>
 
         <div class="col-sm-6">
-          <table id="bottom-10-table" class="table table-responsive table-hover table-striped">
-            <caption class="lead">Bottom 10 Legislatures by <span class="dimension-display">Size</span> in <span class="year-display">2009</span></caption>
+          <table id="bottom" class="table table-responsive table-hover table-striped">
+            <caption class="lead">Bottom Legislatures by <span class="dimension-display">Size</span> in <span class="year-display">2009</span></caption>
             <thead>
-              <tr><th>State Name</th><th>Percent Women</th></tr>
+              <tr><th>State Name</th><th><span class="dimension-display">Size</span></th></tr>
             </thead>
             <tbody>
-              <tr><td>Wyoming</td><td>10%</td></tr>
-              <tr><td>Utah</td><td>12%</td></tr>
-              <tr><td>My State</td><td>20%</td></tr>
-              <tr><td>My State</td><td>20%</td></tr>
-              <tr><td>My State</td><td>20%</td></tr>
-              <tr><td>My State</td><td>20%</td></tr>
-              <tr><td>My State</td><td>20%</td></tr>
-              <tr><td>My State</td><td>20%</td></tr>
-              <tr><td>My State</td><td>20%</td></tr>
-              <tr><td>My State</td><td>20%</td></tr>
+              <tr><td>Loading</td><td>Loading</td></tr>
+              <tr><td>Loading</td><td>Loading</td></tr>
             </tbody>
           </table>
         </div>
@@ -250,7 +234,10 @@
             var requestUrl = compileRequestUrl();
             d3.json(requestUrl, function(err, response){
                 console.log("RESPONSE", response["year"], response["states"].length)
-                zz = response["states"]; // for debugging in the console
+                var sortedResponseObjects = response["states"].sort(function(a, b){
+                  return d3.descending(a["legislature_seats"], b[["legislature_seats"]])
+                });
+                zz = sortedResponseObjects // response["states"]; // for debugging in the console
 
                 calibrateColorScale(lookupAllValues(response["states"]));
 
@@ -276,6 +263,55 @@
                         map.addLayer(stateLayer);
                     };
                 });
+
+
+
+
+
+
+
+
+                var topRows = d3.select("table#top").select("tbody").selectAll("tr")
+                    .data(sortedResponseObjects.slice(0,10))
+
+                topRows.enter().append("tr")
+                    .attr("class", "top")
+                    .each(function(stateObj){
+                        d3.select(this).append("td").text(stateObj["name"]);
+                        d3.select(this).append("td").text(measureValue(stateObj) + compositionValueSuffix());
+                    })
+
+                topRows.exit().remove();
+
+
+
+
+
+
+/*
+
+                var bottomTableBody = d3.select("tbody#bottom")
+                var bottomRows = bottomTableBody.selectAll("tr.bottom")
+                    .data(sortedResponseObjects.slice(-10))
+
+                bottomRows.enter().append("tr")
+                        .attr("class", "bottom")
+
+                bottomRows.append("td").text(function(stateObj){
+                    return stateObj["name"] // compositionValue(stateObj)
+                });
+
+                bottomRows.append("td").text(function(stateObj){
+                    return 5 // compositionValue(stateObj)
+                });
+
+                bottomRows.exit().remove();
+
+                */
+
+
+
+
             });
         };
 
@@ -303,7 +339,7 @@
             var selectedDimensionValue = dimensionSelector.value;
             switch(selectedDimensionValue){
                 case "size":
-                    valuesArray = statesArray.map(function(stateObj){ return stateObj["legislature_seats"] });
+                    valuesArray = statesArray.map(function(stateObj){ return seatCount(stateObj) });
                     break;
                 case "pct-dem":
                     valuesArray = statesArray.map(function(stateObj){ return pctDem(stateObj); });
@@ -330,7 +366,7 @@
             if (stateObj) {
                 switch(selectedDimensionValue){
                     case "size":
-                        value = stateObj["legislature_seats"];
+                        value = seatCount(stateObj);
                         break;
                     case "pct-dem":
                         value = pctDem(stateObj);
@@ -344,11 +380,35 @@
                     case "pct-female":
                         value = pctFemale(stateObj);
                         break;
-                    default:
-                        value = 0.7
                 };
             };
             return value;
+        };
+
+        function measureValue(stateObj){
+          var value;
+          switch(dimensionSelector.value){
+              case "size":
+                  value = seatCount(stateObj);
+                  break;
+              case "pct-dem":
+                  value = pctDem(stateObj);
+                  break;
+              case "pct-gop":
+                  value = pctRep(stateObj);
+                  break;
+              case "pct-male":
+                  value = pctMale(stateObj);
+                  break;
+              case "pct-female":
+                  value = pctFemale(stateObj);
+                  break;
+          };
+          return value;
+        };
+
+        function seatCount(stateObj){
+            return stateObj["legislature_seats"];
         };
 
         function pctFemale(stateObj){
